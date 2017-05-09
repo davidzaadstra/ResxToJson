@@ -94,7 +94,7 @@ namespace Croc.DevTools.ResxToJson
 
 				logger.AddMsg(Severity.Trace, "Processing '{0}' bundle (contains {1} resx files)", bundle.BaseName,
 					bundle.Cultures.Count);
-                string dirPath = options.OutputFormat == OutputFormat.i18next 
+                string dirPath = options.OutputFormat != OutputFormat.RequireJs
                     ? Path.Combine(baseDir, options.FallbackCulture)
                     : baseDir;
                 string outputPath = Path.Combine(dirPath, baseFileName);
@@ -120,10 +120,10 @@ namespace Croc.DevTools.ResxToJson
 	    {
             switch (format)
             {
-                case OutputFormat.RequireJs:
-                    return ".js";
-                default:
+                case OutputFormat.i18next:
                     return ".json";
+                default:
+                    return ".js";
             }
 	    }
 
@@ -153,13 +153,15 @@ namespace Croc.DevTools.ResxToJson
 		static string stringifyJson(JObject json, ResxToJsonConverterOptions options)
 		{
 			string text = json.ToString(Formatting.Indented);
-		    switch (options.OutputFormat)
-		    {
-		        case OutputFormat.RequireJs:
-                    return "define(" + text + ");";
-                default:
-		            return text;
-		    }
+			switch (options.OutputFormat)
+			{
+				case OutputFormat.RequireJs:
+					return "define(" + text + ");";
+				case OutputFormat.es6Module:
+					return "export default " + text;
+				default:
+					return text;
+			}
 		}
 
 		private static JsonResources generateJsonResources(ResourceBundle bundle, ResxToJsonConverterOptions options)

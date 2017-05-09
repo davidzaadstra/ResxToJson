@@ -85,6 +85,7 @@ namespace Croc.DevTools.ResxToJson
     public enum OutputFormat
     {
         RequireJs,
-        i18next
+        i18next,
+        es6Module
     }
 }
